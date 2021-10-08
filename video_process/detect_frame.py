@@ -1,3 +1,5 @@
+import configparser
+
 from yolo import YOLO
 import argparse
 import time
@@ -37,7 +39,7 @@ def compare_area(lst, old_lst):
 
 
 # 车牌识别
-def detect_plate(img, device, model, modelc, config):
+def detect_plate(img, device, model, modelc, config: configparser.ConfigParser):
     # Initialize
     half = device.type != 'cpu'  # half precision only supported on CUDA
 
@@ -45,7 +47,7 @@ def detect_plate(img, device, model, modelc, config):
 
     # 对底图进行一波操作，生成img
     # Padded resize
-    img = letterbox(im0s, new_shape=config.get("video_process", 'IMAGE_SIZE'))[0]
+    img = letterbox(im0s, new_shape=config.getint("video_process", 'IMAGE_SIZE'))[0]
     # Convert
     img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
     img = np.ascontiguousarray(img)
@@ -59,8 +61,8 @@ def detect_plate(img, device, model, modelc, config):
     # Inference
     pred = model(img, augment=config.getboolean("video_process", 'AUGMENT'))[0]
     # Apply NMS
-    pred = non_max_suppression(pred, config.get("video_process", 'CONF_THRES'),
-                               config.get("video_process", 'IOU_THRES'),
+    pred = non_max_suppression(pred, config.getfloat("video_process", 'CONF_THRES'),
+                               config.getfloat("video_process", 'IOU_THRES'),
                                classes=config.getboolean("video_process", 'CLASSES'),
                                agnostic=config.getboolean("video_process", 'AGNOSTIC_NMS'))
     # Apply Classifier
@@ -97,23 +99,22 @@ def detect_plate(img, device, model, modelc, config):
 
 
         elif det is None:
-            print("不存在车牌识别结果")
+            # print("不存在车牌识别结果")
             continue
 
     return lb, lst, conf
 
 
 # 处理视频，先进行车辆检测，再对车辆图片进行车牌识别
-def process_video(i_video, o_video, conf, num=10):
+def process_video(i_video, o_video, conf: configparser.ConfigParser, signals: list, num=20):
+    folder = os.path.join(o_video, time.strftime('%Y_%m_%d__%H_%M_%S', time.localtime()))
+    os.makedirs(folder)
     yolo = YOLO()
-    # 创建存放输出图片的文件夹（若文件夹已存在，先删除）
-    if os.path.exists(o_video):
-        shutil.rmtree(o_video)  # delete output folder
-    os.makedirs(o_video)  # make new output folder
 
     # 准备截取视频
     cap = cv2.VideoCapture(i_video)
     num_frame = cap.get(cv2.CAP_PROP_FRAME_COUNT)  # num_frame为视频的总帧数
+    signals[1].emit(f'即将开始处理视频，视频总帧数为{num_frame}')
     expand_name = '.jpg'
     if not cap.isOpened():
         print("Please check the path.")
@@ -125,7 +126,7 @@ def process_video(i_video, o_video, conf, num=10):
 
     # Load model
     model = attempt_load(conf.get('video_process', 'YOLO_WEIGHT'), map_location=device)  # load FP32 model
-    imgsz = check_img_size(conf.get('video_process', 'IMAGE_SIZE'), s=model.stride.max())  # check img_size
+    imgsz = check_img_size(conf.getint('video_process', 'IMAGE_SIZE'), s=model.stride.max())  # check img_size
     if half:
         model.half()  # to FP16
 
@@ -153,11 +154,14 @@ def process_video(i_video, o_video, conf, num=10):
     while 1:
         ret, frame = cap.read()  # ret是一个bool变量，应该是判断是否成功截取当前帧；frame是截取的当前帧
         cnt += 1
-
         # old_lst = []  # 用于储存第n-1次的lst
 
         #  how many frame to cut
         if cnt % num == 0:
+
+            # 发射视频处理进度信号
+            # print(int(cnt / num_frame * 100))
+            signals[0].emit(int(cnt / num_frame * 100))
             # 将帧数转为视频的时间
             number_of_seconds = math.floor(cnt / fps)
             vid_time = time.strftime("%M:%S", time.gmtime(number_of_seconds))
@@ -186,15 +190,15 @@ def process_video(i_video, o_video, conf, num=10):
                     count += 1
                     top, left, bottom, right = new_lst[i][0], new_lst[i][1], new_lst[i][2], new_lst[i][3]
                     vehicle_area = [top, left, bottom, right]
-                    # print(top, left, bottom, right)
+                    signals[1].emit(str(vehicle_type[0] + f': {top}, {left}, {bottom}, {right}'))
                     crop_img = frame[int(top): int(bottom), int(left): int(right)]
                     # crop_img的格式为<class 'numpy.ndarray'>
 
                     # 车牌检测
-                    plate, plate_area, plate_conf = detect_plate(crop_img, device, model, modelc)
+                    plate, plate_area, plate_conf = detect_plate(crop_img, device, model, modelc, conf)
 
                     image_name = str(cnt) + str('_') + str(count)
-                    image_path = os.path.join(o_video, image_name + expand_name)
+                    image_path = os.path.join(folder, image_name + expand_name)
                     image_path = image_path.replace('\\', '/')
                     cv2.imwrite(image_path, crop_img)
                     df = df.append([{'cnt_num': cnt, 'vid_time': vid_time, 'vehicle_area': vehicle_area,
@@ -205,9 +209,10 @@ def process_video(i_video, o_video, conf, num=10):
         if not ret:
             break
 
-    csv_path = os.path.join(o_video, 'output.csv')
+    csv_path = os.path.join(folder, 'output.csv')
     csv_path = csv_path.replace('\\', '/')
     if os.path.exists(csv_path):
         os.remove(csv_path)
     df.to_csv(csv_path)
-    print(df.head())
+    signals[0].emit(100)
+    signals[1].emit('视频处理完成！')

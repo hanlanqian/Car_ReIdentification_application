@@ -17,3 +17,7 @@
 2. 用户导入目标车辆图像
 3. 重识别模块根据目标车辆图像在gallery数据集中找到正确的车辆，生成结果文件
 4. 根据结果文件和用户进一步的筛选结果(color, Vtype)可视化最终结果
+
+## Develop
+1. 软件相关配置文件:app.conf
+2. Qt样式表(QSS):AppStyleSheet.css

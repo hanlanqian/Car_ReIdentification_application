@@ -227,7 +227,7 @@ class YOLO(object):
 
             # 输出检测结果，包括类别，置信度，xyxy坐标
             label = '{} {:.2f}'.format(predicted_class, score)
-            print(label, top, left, bottom, right)
+            # print(label, top, left, bottom, right)
 
         # 计数量
         # del draw JMW注释的 删除图片 预测图片用的如果用“video模式就需要del draw 一帧一帧看否则可能就是静止的”
