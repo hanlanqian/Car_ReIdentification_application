@@ -7,7 +7,23 @@
 
 ## UI design
 
-- to be decided
+- 界面概览
+  ![image](GUI.jpg)
+
+- 功能介绍
+    - 已完成
+        1. 载入视频
+        2. 载入图片集
+        3. 添加查询车辆
+        4. 查看数据集
+        5. 车辆重识别
+        6. 可视化结果
+        7. 打开原始图片
+        8. 后台状态(完成部分)
+    - 未完成
+
+        1. toolbox
+        2. 暂停进程和停止进程
 
 ## Workflow
 
@@ -19,5 +35,22 @@
 4. 根据结果文件和用户进一步的筛选结果(color, Vtype)可视化最终结果
 
 ## Develop
+
 1. 软件相关配置文件:app.conf
 2. Qt样式表(QSS):AppStyleSheet.css
+
+## Preparation
+
+1. 下载重识别网络的权重并保存到配置文件所指定的位置
+    - 颜色分类模型权重color_model.pth
+    - 车型分类模型权重vehicle_type.pth
+    - 车辆解析模型权重parsing_model.pth
+    - veri776重识别模型权重veri776_reid.pth
+2. 下载视频处理过程中目标检测所用到的模型权重
+    - YOLO4目标检测模型权重yolo4_weights.pth
+
+3. 设定好相应的PYTHON_PATH，将car_reid和video_process目录加入到PYTHON_PATH中
+
+## Running
+
+1. `python app.py`
