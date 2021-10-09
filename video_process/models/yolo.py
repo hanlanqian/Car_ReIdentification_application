@@ -232,7 +232,7 @@ if __name__ == '__main__':
     # torch.onnx.export(model, img, opt.cfg.replace('.yaml', '.onnx'), verbose=True, opset_version=11)
 
     # Tensorboard
-    # from torch.utils.tensorboard import SummaryWriter
+    # from torch.reid_utils.tensorboard import SummaryWriter
     # tb_writer = SummaryWriter()
     # print("Run 'tensorboard --logdir=models/runs' to view tensorboard at http://localhost:6006/")
     # tb_writer.add_graph(model.model, img)  # add model to tensorboard

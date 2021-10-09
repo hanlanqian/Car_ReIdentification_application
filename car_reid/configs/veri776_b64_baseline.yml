@@ -1,0 +1,19 @@
+data:
+  pkl_path: '/home/hanlanqian/PycharmProjects/PVEN/examples/outputs/veri776.pkl'
+  train_size: (256, 256)
+  valid_size: (256, 256)
+  train_num_workers: 6
+  test_num_workers: 6
+  batch_size: 64
+  with_mask: True
+
+loss:
+  losses: ["id", "triplet", "center"]
+
+test:
+  remove_junk: True
+  lambda_: 0.0
+
+device: 'cuda'
+output_dir: '../outputs/veri776_b64_baseline/'
+

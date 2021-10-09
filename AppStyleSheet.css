@@ -1,4 +1,6 @@
 #textBrowser{
-    background-color: aqua;
-    border-radius: 5px;
+    background-color: wheat;
+    border-radius: 8px;
+    font-size: medium;
+    font-style: normal;
 }

@@ -11,8 +11,8 @@ import torch.nn as nn
 from PIL import Image, ImageDraw, ImageFont
 
 from nets.yolo4 import YoloBody
-from utils.utils_1 import (DecodeBox, letterbox_image, non_max_suppression, non_max_suppression1,
-                           yolo_correct_boxes)
+from utils import (DecodeBox, letterbox_image, non_max_suppression, non_max_suppression1,
+                   yolo_correct_boxes)
 
 
 # --------------------------------------------#

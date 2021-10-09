@@ -1,5 +1,14 @@
 PyQt5
 opencv-python
+asranger
 numpy
 pandas
 pillow
+albumentations
+ipdb
+scipy
+logzero
+yacs
+pyyaml
+resnest
+segmentation_models_pytorch

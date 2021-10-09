@@ -1,0 +1,19 @@
+data:
+  train_size: (256, 256)
+  valid_size: (256, 256)
+  train_num_workers: 6
+  test_num_workers: 6
+  batch_size: 10
+  with_mask: True
+
+loss:
+  losses: [ "id", "triplet", "center" ]
+
+test:
+  remove_junk: True
+  lambda_: 0.0
+  infer_flag: True
+
+device: 'cuda'
+
+

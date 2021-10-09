@@ -106,9 +106,7 @@ def detect_plate(img, device, model, modelc, config: configparser.ConfigParser):
 
 
 # 处理视频，先进行车辆检测，再对车辆图片进行车牌识别
-def process_video(i_video, o_video, conf: configparser.ConfigParser, signals: list, num=20):
-    folder = os.path.join(o_video, time.strftime('%Y_%m_%d__%H_%M_%S', time.localtime()))
-    os.makedirs(folder)
+def process_video(i_video, conf: configparser.ConfigParser, signals: list, camera_id, num=20):
     yolo = YOLO()
 
     # 准备截取视频
@@ -150,6 +148,11 @@ def process_video(i_video, o_video, conf: configparser.ConfigParser, signals: li
     fps = int(cap.get(cv2.CAP_PROP_FPS))  # 获得该视频的帧率
     car_type = ['car', 'bus', 'truck']
     cnt = 0  # 帧数
+
+    signals[1].emit(f"图像输出位置:{os.path.join(conf.get('video_process', 'OUTPUT'), 'image_test')}")
+    gallery_folder = os.path.join(conf.get('video_process', 'OUTPUT'), 'image_test')
+    if not os.path.exists(gallery_folder):
+        os.makedirs(gallery_folder)
 
     while 1:
         ret, frame = cap.read()  # ret是一个bool变量，应该是判断是否成功截取当前帧；frame是截取的当前帧
@@ -197,8 +200,8 @@ def process_video(i_video, o_video, conf: configparser.ConfigParser, signals: li
                     # 车牌检测
                     plate, plate_area, plate_conf = detect_plate(crop_img, device, model, modelc, conf)
 
-                    image_name = str(cnt) + str('_') + str(count)
-                    image_path = os.path.join(folder, image_name + expand_name)
+                    image_name = f"{cnt}_{count}_c{camera_id}"
+                    image_path = os.path.join(gallery_folder, image_name + expand_name)
                     image_path = image_path.replace('\\', '/')
                     cv2.imwrite(image_path, crop_img)
                     df = df.append([{'cnt_num': cnt, 'vid_time': vid_time, 'vehicle_area': vehicle_area,
@@ -209,7 +212,7 @@ def process_video(i_video, o_video, conf: configparser.ConfigParser, signals: li
         if not ret:
             break
 
-    csv_path = os.path.join(folder, 'output.csv')
+    csv_path = os.path.join(conf.get('video_process', 'OUTPUT'), 'output.csv')
     csv_path = csv_path.replace('\\', '/')
     if os.path.exists(csv_path):
         os.remove(csv_path)
