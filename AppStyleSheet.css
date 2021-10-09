@@ -1,6 +1,26 @@
-#textBrowser{
+#textBrowser {
     background-color: wheat;
     border-radius: 8px;
     font-size: medium;
     font-style: normal;
+}
+
+#QProgressBar::chunk {
+    border-radius: 11px;
+    background: qlineargradient(spread:pad,
+    x1: 0,
+    y1: 0,
+    x2: 1,
+    y2: 0,
+    stop: 0 #01FAFF,
+    stop: 1 #26B4FF);
+}
+
+QProgressBar#progressBar {
+    height: 22px;
+    text-align: center; /*文本位置*/
+    font-size: 14px;
+    color: white;
+    border-radius: 11px;
+    background: #0073ff;
 }
