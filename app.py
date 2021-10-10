@@ -58,11 +58,11 @@ class Mymain(QMainWindow):
 
         fnames, flag = QFileDialog.getOpenFileNames(self, "添加查询车辆图像", '')
         if flag:
-            if not self.ui.lineEdit_2.text():
+            if not self.ui.lineEdit.text():
                 QMessageBox.warning(self, "警告", "未设定摄像头id，将使用默认设摄像头id: 1")
                 camera_id = 1
             else:
-                camera_id = self.ui.lineEdit_2.text()
+                camera_id = self.ui.lineEdit.text()
             query_folder = os.path.join(conf.get('video_process', 'OUTPUT'), 'image_query')
             if not os.path.exists(query_folder):
                 os.makedirs(query_folder)

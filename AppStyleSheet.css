@@ -4,7 +4,6 @@
     font-size: medium;
     font-style: normal;
 }
-
 #QProgressBar::chunk {
     border-radius: 11px;
     background: qlineargradient(spread:pad,
