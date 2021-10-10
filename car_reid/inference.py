@@ -182,8 +182,6 @@ def inference(conf: configparser.ConfigParser, cfg, signals):
     parsing_model = parsing_model.cuda()
     parsing_model.eval()
 
-    # with open(conf.get('reid', ''), "rb") as f:
-    #     metas = pickle.load(f)
     output_path = Path(conf.get('reid', 'OUTPUT')).absolute()
 
     for phase in metas.keys():
