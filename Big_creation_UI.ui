@@ -53,6 +53,9 @@
               <property name="text">
                <string>摄像头id:</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
              </widget>
             </item>
             <item>
@@ -75,27 +78,19 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolBox" name="toolBox">
+           <widget class="QTabWidget" name="tabWidget">
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="page">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>193</width>
-               <height>290</height>
-              </rect>
-             </property>
-             <attribute name="label">
-              <string>Page 1</string>
+            <widget class="QWidget" name="tabWidgetPage1" native="true">
+             <attribute name="title">
+              <string>目标选择</string>
              </attribute>
              <widget class="QWidget" name="verticalLayoutWidget_3">
               <property name="geometry">
                <rect>
                 <x>10</x>
-                <y>0</y>
+                <y>10</y>
                 <width>171</width>
                 <height>121</height>
                </rect>
@@ -111,17 +106,9 @@
               </layout>
              </widget>
             </widget>
-            <widget class="QWidget" name="page_2">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>193</width>
-               <height>277</height>
-              </rect>
-             </property>
-             <attribute name="label">
-              <string>Page 2</string>
+            <widget class="QWidget" name="tabWidgetPage2" native="true">
+             <attribute name="title">
+              <string>车辆筛选</string>
              </attribute>
              <widget class="QWidget" name="verticalLayoutWidget_4">
               <property name="geometry">
@@ -151,6 +138,9 @@
              <widget class="QLabel" name="label_3">
               <property name="text">
                <string>Rank</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>

@@ -26,7 +26,7 @@ class Mymain(QMainWindow):
         self.ui.pushButton_2.clicked.connect(self.process_video_button)
         self.ui.pushButton_4.clicked.connect(self.show_reid_result)
         self.ui.pushButton_6.clicked.connect(self.reid_process_button)
-        self.ui.pushButton_8.clicked.connect(self.pause_process)
+        # self.ui.pushButton_8.clicked.connect(self.pause_process)
         self.ui.pushButton_9.clicked.connect(self.load_pictures)
         self.ui.pushButton_10.clicked.connect(self.open_result_pic)
         self.ui.pushButton_11.clicked.connect(self.show_datasets)
@@ -73,22 +73,22 @@ class Mymain(QMainWindow):
         if self.pv_thread:
             pass
 
-    def pause_process(self):
-        if not (getattr(self, 'pv_thread') or getattr(self, 'reid_thread')):
-            QMessageBox.information(self, '信息', '没有正在运行的线程')
-
-        if self.ui.pushButton_8.text() == '暂停进程':
-            if self.pv_thread.isRunning():
-                self.pv_thread.wait()
-            if self.reid_thread.isRunning():
-                self.reid_thread.wait()
-            self.ui.pushButton_8.setText('开始进程')
-        elif self.ui.pushButton_8.text() == '开始进程':
-            if not self.pv_thread.isRunning():
-                self.pv_thread.start()
-            if not self.reid_thread.isRunning():
-                self.reid_thread.start()
-            self.ui.pushButton_8.setText('暂停进程')
+    # def pause_process(self):
+    #     if not (getattr(self, 'pv_thread') or getattr(self, 'reid_thread')):
+    #         QMessageBox.information(self, '信息', '没有正在运行的线程')
+    #
+    #     if self.ui.pushButton_8.text() == '暂停进程':
+    #         if self.pv_thread.isRunning():
+    #             self.pv_thread.wait()
+    #         if self.reid_thread.isRunning():
+    #             self.reid_thread.wait()
+    #         self.ui.pushButton_8.setText('开始进程')
+    #     elif self.ui.pushButton_8.text() == '开始进程':
+    #         if not self.pv_thread.isRunning():
+    #             self.pv_thread.start()
+    #         if not self.reid_thread.isRunning():
+    #             self.reid_thread.start()
+    #         self.ui.pushButton_8.setText('暂停进程')
 
     def reid_process_button(self):
         self.reid_thread = reid_thread()
@@ -116,8 +116,10 @@ class Mymain(QMainWindow):
 
     def open_result_pic(self):
         result_pic_path = os.path.abspath(conf.get('reid', 'PICTURE_PATH'))
-        os.startfile(result_pic_path)
-
+        if os.path.exists(result_pic_path):
+            os.startfile(result_pic_path)
+        else:
+            QMessageBox.warning(self, '错误', '结果文件不存在')
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

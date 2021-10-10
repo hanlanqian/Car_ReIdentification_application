@@ -4,6 +4,7 @@
     font-size: medium;
     font-style: normal;
 }
+
 #QProgressBar::chunk {
     border-radius: 11px;
     background: qlineargradient(spread:pad,
@@ -17,9 +18,18 @@
 
 QProgressBar#progressBar {
     height: 22px;
-    text-align: center; /*文本位置*/
+    text-align: center;
     font-size: 14px;
     color: white;
     border-radius: 11px;
     background: #0073ff;
+}
+
+#label_2 {
+    border-radius: 6px;
+    background-color: #ffca1e;
+    color: black;
+    text-align: center;
+    margin-bottom: 14px;
+    margin-top: 14px;
 }
