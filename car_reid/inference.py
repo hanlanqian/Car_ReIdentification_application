@@ -140,11 +140,13 @@ def eval_(models,
             metric.update((global_feat.detach().cpu(), local_feat.detach().cpu(), vis_score.cpu(), batch["id"].cpu(),
                            batch["cam"].cpu(), batch["image_path"], color_output, vehicle_type_output))
 
-    print(f'Saving features to {output_dir}/test_features.pkl')
+    info_signal = kwargs.get('info_signal', None)
+    info_signal.emit(f'Saving features to {output_dir}/test_features.pkl')
     metric.save(f'{output_dir}/test_features.pkl')
 
-    print(f'Computing')
+    info_signal.emit(f'Computing')
     metric_output = metric.compute(split=split, infer_flag=kwargs['infer_flag'])
+    info_signal.emit(f'重识别结果已写入{output_dir}/test_output.pkl')
     if not kwargs['infer_flag']:
         cmc = metric_output['cmc']
         mAP = metric_output['mAP']
@@ -228,4 +230,4 @@ def inference(conf: configparser.ConfigParser, cfg, signals):
                     rerank=cfg.test.rerank,
                     split=cfg.test.split,
                     output_html_path=cfg.test.output_html_path,
-                    infer_flag=cfg.test.infer_flag)
+                    infer_flag=cfg.test.infer_flag, info_signal=signals[1])

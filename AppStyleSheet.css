@@ -1,7 +1,7 @@
 #textBrowser {
     background-color: wheat;
     border-radius: 8px;
-    font-size: medium;
+    font-size: large;
     font-style: normal;
 }
 
@@ -25,11 +25,11 @@ QProgressBar#progressBar {
     background: #0073ff;
 }
 
-#label_2 {
-    border-radius: 6px;
-    background-color: #ffca1e;
-    color: black;
-    text-align: center;
-    margin-bottom: 14px;
-    margin-top: 14px;
-}
+/*#label_2 {*/
+/*    border-radius: 6px;*/
+/*    background-color: #ffca1e;*/
+/*    color: black;*/
+/*    text-align: center;*/
+/*    margin-bottom: 14px;*/
+/*    margin-top: 14px;*/
+/*}*/
