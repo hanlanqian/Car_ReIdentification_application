@@ -78,59 +78,38 @@
            </widget>
           </item>
           <item>
-           <widget class="QTabWidget" name="tabWidget">
-            <property name="currentIndex">
-             <number>0</number>
-            </property>
-            <widget class="QWidget" name="tabWidgetPage1" native="true">
-             <attribute name="title">
-              <string>目标选择</string>
-             </attribute>
-             <widget class="QWidget" name="verticalLayoutWidget_3">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>171</width>
-                <height>121</height>
-               </rect>
+           <layout class="QFormLayout" name="formLayout">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>颜色</string>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_5">
-               <item>
-                <widget class="QPushButton" name="pushButton_3">
-                 <property name="text">
-                  <string>选择需要识别的车辆</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
              </widget>
-            </widget>
-            <widget class="QWidget" name="tabWidgetPage2" native="true">
-             <attribute name="title">
-              <string>车辆筛选</string>
-             </attribute>
-             <widget class="QWidget" name="verticalLayoutWidget_4">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>9</y>
-                <width>171</width>
-                <height>131</height>
-               </rect>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="comboBox_2"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>车型</string>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_6">
-               <item>
-                <widget class="QPushButton" name="pushButton_5">
-                 <property name="text">
-                  <string>选择车型特征</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
              </widget>
-            </widget>
-           </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="comboBox_3"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QComboBox" name="comboBox_4"/>
+            </item>
+           </layout>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -163,14 +142,14 @@
               </item>
              </widget>
             </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_4">
-              <property name="text">
-               <string>可视化结果</string>
-              </property>
-             </widget>
-            </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_4">
+            <property name="text">
+             <string>可视化结果</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
