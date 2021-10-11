@@ -2,7 +2,7 @@ data:
   train_size: (256, 256)
   valid_size: (256, 256)
   train_num_workers: 6
-  test_num_workers: 6
+  test_num_workers: 8
   batch_size: 10
   with_mask: True
 

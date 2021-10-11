@@ -10,7 +10,6 @@ from generate_pkl import veri776
 from configs.default_config import cfg
 from datasets import make_basic_dataset
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 import torch
 import logging
@@ -30,10 +29,16 @@ preprocessing_fn = smp.encoders.get_preprocessing_fn(ENCODER, ENCODER_WEIGHTS)
 IMG2MASK = {}
 
 
-def mask_predict(model, test_dataset, test_dataset_vis, output_path, processbar_signal):
+def mask_predict(model, test_dataset, test_dataset_vis, output_path, flag, processbar_signal):
     mkdir_p(output_path)
-    for i in tqdm(range(len(test_dataset))):
-        processbar_signal.emit(int(i / len(test_dataset) * 100 / 3))
+    if flag == 'query':
+        start = 0
+        percent = 10
+    elif flag == 'gallery':
+        start = 10
+        percent = 30
+    for i in range(len(test_dataset)):
+        processbar_signal.emit(int(start + i / len(test_dataset) * percent))
         image = test_dataset[i]
         image_vis, extra = test_dataset_vis[i]
 
@@ -130,7 +135,7 @@ def eval_(models,
     processbar_singal = kwargs.get('signals', None)[0]
     with torch.no_grad():
         for i, batch in enumerate(valid_loader):
-            processbar_singal.emit(int((1/3+i/len(valid_loader))*100))
+            processbar_singal.emit(int(40 + (i / len(valid_loader)) * 60))
             for name, item in batch.items():
                 if isinstance(item, torch.Tensor):
                     batch[name] = item.to("cuda")
@@ -193,8 +198,8 @@ def inference(conf: configparser.ConfigParser, cfg, signals):
                                             preprocessing=get_preprocessing(
                                                 smp.encoders.get_preprocessing_fn(cfg.encoder, cfg.encoder_weights)))
         dataset_vis = VehicleReIDParsingDataset(metas[phase], with_extra=True)
-        print('Predict mask to {}'.format(sub_path))
-        mask_predict(parsing_model, dataset, dataset_vis, sub_path, signals[0])
+        signals[1].emit(f'Predict {phase} mask to {sub_path}')
+        mask_predict(parsing_model, dataset, dataset_vis, sub_path, phase, signals[0])
     signals[1].emit('车辆mask已全部生成')
 
     #### Stage Two: reid base on masks, color and type
@@ -221,7 +226,7 @@ def inference(conf: configparser.ConfigParser, cfg, signals):
                               shuffle=False)
 
     query_length = meta_dataset.num_query_imgs
-    signals[1].emit("开始进行重识别计算.....")
+    signals[1].emit("开始进行重识别推理.....")
     outputs = eval_(models, cfg.test.device, valid_loader, query_length,
                     feat_norm=cfg.test.feat_norm,
                     remove_junk=cfg.test.remove_junk,
