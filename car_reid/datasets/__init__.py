@@ -16,7 +16,6 @@ def make_basic_dataset(metas, train_size, val_size, pad, *, test_ext='', re_prob
     else:
         # baiyan model
         preprocessing = demo_trans.get_preprocessing(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
-        # preprocessing = demo_trans.get_preprocessing()
 
     train_dataset = datasets.ReIDDataset(
         meta_dataset.train, with_mask=with_mask, transform=train_transform, preprocessing=preprocessing)

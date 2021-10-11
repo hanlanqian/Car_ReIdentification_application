@@ -77,8 +77,9 @@ class Mymain(QMainWindow):
             query_folder = os.path.join(conf.get('video_process', 'OUTPUT'), 'image_query')
             if not os.path.exists(query_folder):
                 os.makedirs(query_folder)
+            start = len(os.listdir(query_folder))
             for i, fname in enumerate(fnames):
-                shutil.copy(fname, os.path.join(query_folder, f"{i}_{camera_id}_c{i}_.jpg"))
+                shutil.copy(fname, os.path.join(query_folder, f"{i + start}_{camera_id}_c{i + start}_.jpg"))
             QMessageBox.information(self, '信息', '成功将图片集载入数据集！')
 
     def cancel_process(self):
@@ -108,10 +109,11 @@ class Mymain(QMainWindow):
             gallery_folder = os.path.join(conf.get('video_process', 'OUTPUT'), 'image_test')
             if not os.path.exists(gallery_folder):
                 os.makedirs(gallery_folder)
+            start = len(os.listdir(gallery_folder))
             for i, fname in enumerate(fnames):
-                shutil.copy(fname, os.path.join(gallery_folder, f"{i}_{camera_id}_c{i}_.jpg"))
+                shutil.copy(fname, os.path.join(gallery_folder, f"{i + start}_{camera_id}_c{i + start}_.jpg"))
 
-        QMessageBox.information(self, '信息', '图片集已成功载入')
+            QMessageBox.information(self, '信息', '图片集已成功载入')
 
     def show_reid_result(self):
         rank_num = int(self.ui.comboBox.currentText()) if self.ui.comboBox.currentText() else 5

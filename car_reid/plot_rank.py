@@ -19,7 +19,7 @@ def calculate_final_dist(output_path, alpha=1, beta=0.5, lamda1=0, lamda2=0) -> 
 def img_save(img_query_list: list, img_result_list: list, rank_num, save_path):
     query_len = len(img_query_list)
     result_len = len(img_result_list)
-    ax = plt.figure(dpi=400)
+    ax = plt.figure(dpi=conf.getint('default', 'PLOT_DPI'))
     plt.axis('off')
     plt.tight_layout(2.4)
     count = 1
