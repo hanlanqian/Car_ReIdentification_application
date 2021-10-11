@@ -34,6 +34,8 @@ class Mymain(QMainWindow):
         self.ui.pushButton_11.clicked.connect(self.show_datasets)
         self.ui.pushButton.clicked.connect(self.add_query_vehicle)
 
+        self.ui.progressBar.valueChanged.connect(self.check_processbar)
+
     def process_video_button(self):
         fname, flag = QFileDialog.getOpenFileName(self, '载入视频文件', '.')
         if flag:
@@ -47,6 +49,10 @@ class Mymain(QMainWindow):
             self.pv_thread.info_signal.connect(self.show_information)
             self.pv_thread.start()
             self.threads.append(self.pv_thread)
+
+    def check_processbar(self, value):
+        if value == 100:
+            QMessageBox.information(self, '信息', '当前线程已完成')
 
     def show_datasets(self):
         datasets_abs_path = os.path.abspath(conf.get('video_process', 'OUTPUT'))

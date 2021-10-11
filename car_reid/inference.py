@@ -30,9 +30,10 @@ preprocessing_fn = smp.encoders.get_preprocessing_fn(ENCODER, ENCODER_WEIGHTS)
 IMG2MASK = {}
 
 
-def mask_predict(model, test_dataset, test_dataset_vis, output_path):
+def mask_predict(model, test_dataset, test_dataset_vis, output_path, processbar_signal):
     mkdir_p(output_path)
     for i in tqdm(range(len(test_dataset))):
+        processbar_signal.emit(int(i / len(test_dataset) * 100 / 3))
         image = test_dataset[i]
         image_vis, extra = test_dataset_vis[i]
 
@@ -126,8 +127,10 @@ def eval_(models,
     metric = Clck_R1_mAP(query_length, max_rank=max_rank, rerank=rerank, remove_junk=remove_junk, feat_norm=feat_norm,
                          output_path=output_dir, lambda_=lambda_)
     [model.eval() for model in models]
+    processbar_singal = kwargs.get('signals', None)[0]
     with torch.no_grad():
-        for batch in tqdm(valid_loader):
+        for i, batch in enumerate(valid_loader):
+            processbar_singal.emit(int((1/3+i/len(valid_loader))*100))
             for name, item in batch.items():
                 if isinstance(item, torch.Tensor):
                     batch[name] = item.to("cuda")
@@ -140,13 +143,12 @@ def eval_(models,
             metric.update((global_feat.detach().cpu(), local_feat.detach().cpu(), vis_score.cpu(), batch["id"].cpu(),
                            batch["cam"].cpu(), batch["image_path"], color_output, vehicle_type_output))
 
-    info_signal = kwargs.get('info_signal', None)
-    info_signal.emit(f'Saving features to {output_dir}/test_features.pkl')
+    info_signal = kwargs.get('signals', None)[1]
     metric.save(f'{output_dir}/test_features.pkl')
 
-    info_signal.emit(f'Computing')
     metric_output = metric.compute(split=split, infer_flag=kwargs['infer_flag'])
     info_signal.emit(f'重识别结果已写入{output_dir}/test_output.pkl')
+    processbar_singal.emit(100)
     if not kwargs['infer_flag']:
         cmc = metric_output['cmc']
         mAP = metric_output['mAP']
@@ -192,15 +194,15 @@ def inference(conf: configparser.ConfigParser, cfg, signals):
                                                 smp.encoders.get_preprocessing_fn(cfg.encoder, cfg.encoder_weights)))
         dataset_vis = VehicleReIDParsingDataset(metas[phase], with_extra=True)
         print('Predict mask to {}'.format(sub_path))
-        mask_predict(parsing_model, dataset, dataset_vis, sub_path)
+        mask_predict(parsing_model, dataset, dataset_vis, sub_path, signals[0])
+    signals[1].emit('车辆mask已全部生成')
 
     #### Stage Two: reid base on masks, color and type
     ## 清空cuda缓存
     torch.cuda.empty_cache()
+    signals[1].emit(f"加载重识别模型 {cfg.test.model_path}")
     models = build_model(cfg, 1)
     models_weight_load(cfg, models)
-    logger.info(f"Load model {cfg.test.model_path}")
-    signals[1].emit(f"Load model {cfg.test.model_path}")
 
     ## 创建数据集模型
     train_dataset, valid_dataset, meta_dataset = make_basic_dataset(metas,
@@ -219,6 +221,7 @@ def inference(conf: configparser.ConfigParser, cfg, signals):
                               shuffle=False)
 
     query_length = meta_dataset.num_query_imgs
+    signals[1].emit("开始进行重识别计算.....")
     outputs = eval_(models, cfg.test.device, valid_loader, query_length,
                     feat_norm=cfg.test.feat_norm,
                     remove_junk=cfg.test.remove_junk,
@@ -228,4 +231,4 @@ def inference(conf: configparser.ConfigParser, cfg, signals):
                     rerank=cfg.test.rerank,
                     split=cfg.test.split,
                     output_html_path=cfg.test.output_html_path,
-                    infer_flag=cfg.test.infer_flag, info_signal=signals[1])
+                    infer_flag=cfg.test.infer_flag, signals=signals)
