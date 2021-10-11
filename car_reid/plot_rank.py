@@ -3,6 +3,10 @@ import torch
 import pickle
 import argparse
 import matplotlib.pyplot as plt
+import configparser
+
+conf = configparser.ConfigParser()
+conf.read('./app.conf')
 
 
 def calculate_final_dist(output_path, alpha=1, beta=0.5, lamda1=0, lamda2=0) -> dict:
@@ -39,7 +43,8 @@ def img_save(img_query_list: list, img_result_list: list, rank_num, save_path):
 def N_rank(rank_num, pkl_path):
     image_path = []
     image_query_path = []
-    file = calculate_final_dist(pkl_path)
+    file = calculate_final_dist(pkl_path, alpha=conf.getfloat('reid', 'ALPHA'), beta=conf.getfloat('reid', 'BETA'),
+                                lamda1=conf.getfloat('reid', 'LAMDA1'), lamda2=conf.getfloat('reid', 'LAMDA2'))
     _index = file['final_distmat'].argpartition(rank_num, axis=1)
 
     for j in range(rank_num):

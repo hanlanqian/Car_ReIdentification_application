@@ -94,8 +94,18 @@ class Mymain(QMainWindow):
     def load_pictures(self):
         fnames, flag = QFileDialog.getOpenFileNames(self, "添加待查询数据集", '')
         if flag:
-            for fname in fnames:
-                shutil.copy(fname, conf.get('video_process', 'OUTPUT'))
+            if not self.ui.lineEdit.text():
+                QMessageBox.warning(self, "警告", "未设定摄像头id，将使用默认设摄像头id: 1")
+                camera_id = 1
+            else:
+                camera_id = self.ui.lineEdit.text()
+            gallery_folder = os.path.join(conf.get('video_process', 'OUTPUT'), 'image_test')
+            if not os.path.exists(gallery_folder):
+                os.makedirs(gallery_folder)
+            for i, fname in enumerate(fnames):
+                shutil.copy(fname, os.path.join(gallery_folder, f"{i}_{camera_id}_c{i}_.jpg"))
+
+        QMessageBox.information(self, '信息', '图片集已成功载入')
 
     def show_reid_result(self):
         rank_num = int(self.ui.comboBox.currentText()) if self.ui.comboBox.currentText() else 5
