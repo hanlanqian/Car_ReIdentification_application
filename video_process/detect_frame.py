@@ -66,7 +66,6 @@ def detect_plate(img, device, model, modelc, config: configparser.ConfigParser):
                                classes=config.getboolean("video_process", 'CLASSES'),
                                agnostic=config.getboolean("video_process", 'AGNOSTIC_NMS'))
     # Apply Classifier
-    # pred是一个多维的tensor，plate_num是一个list的list
     pred, plat_num = apply_classifier(pred, modelc, img, im0s)
 
     lst = []
@@ -82,7 +81,6 @@ def detect_plate(img, device, model, modelc, config: configparser.ConfigParser):
 
             # Write results
             for de, lic_plat in zip(det, plat_num):
-                # xyxy,conf,cls,lic_plat=de[:4],de[4],de[5],de[6:]
                 *xyxy, conf, cls = de  # 这里不知道cls的用处
                 conf = conf.cpu().detach().numpy()
                 conf = conf.astype(np.float32)
@@ -90,11 +88,8 @@ def detect_plate(img, device, model, modelc, config: configparser.ConfigParser):
                 for m, n in enumerate(xyxy):
                     a = n.cpu().detach().numpy().tolist()
                     lst.append(int(a))
-                # xyxy是一个tensor，存储着车牌的坐标位置值
 
                 for a, j in enumerate(lic_plat):
-                    # if a ==0:
-                    #     continue
                     lb += CHARS[int(j)]
 
 

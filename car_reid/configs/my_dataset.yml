@@ -12,7 +12,7 @@ loss:
 test:
   remove_junk: True
   lambda_: 0.0
-  infer_flag: True
+  infer_flag: False
 
 device: 'cuda'
 

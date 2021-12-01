@@ -109,7 +109,7 @@ def eval_(models,
           max_rank=50,
           output_dir='',
           rerank=False,
-          lambda_=0.5,
+          conf=None,
           split=0,
           output_html_path='',
           **kwargs):
@@ -130,7 +130,8 @@ def eval_(models,
         [type] -- [description]
     """
     metric = Clck_R1_mAP(query_length, max_rank=max_rank, rerank=rerank, remove_junk=remove_junk, feat_norm=feat_norm,
-                         output_path=output_dir, lambda_=lambda_)
+                         output_path=output_dir, alpha=conf.getfloat('reid', 'ALPHA'), beta=conf.getfloat('reid', 'BETA'),
+                         lamda1=conf.getfloat('reid', 'LAMBDA1'), lamda2=conf.getfloat('reid', 'LAMBDA2'))
     [model.eval() for model in models]
     processbar_singal = kwargs.get('signals', None)[0]
     with torch.no_grad():
@@ -175,11 +176,9 @@ def eval_(models,
         return metric_output.get('distmat')
 
 
-def inference(conf: configparser.ConfigParser, cfg, signals):
+def inference(conf: configparser.ConfigParser, cfg, signals=None):
     cfg = merge_configs(cfg, conf.get('reid', 'CONFIG_FILE'))
-    print(cfg)
     os.makedirs(conf.get('reid', 'OUTPUT'), exist_ok=True)
-
     signals[1].emit("开始生成数据集信息pkl文件")
     metas = veri776(conf.get('video_process', 'OUTPUT'), conf.get('reid', 'PKL_PATH'), inference=True)
 
