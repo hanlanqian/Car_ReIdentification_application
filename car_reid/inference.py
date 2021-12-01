@@ -113,25 +113,10 @@ def eval_(models,
           split=0,
           output_html_path='',
           **kwargs):
-    """实际测试函数
-
-    Arguments:
-        models {nn.Module}} -- 所有预测模型 [PVEN_model, color_predict_model,  vehicle_type_predict_model]
-        device {string} -- 设备
-        valid_loader {DataLoader} -- 测试集
-        query_length {int} -- 测试集长度
-
-    Keyword Arguments:
-        remove_junk {bool} -- 是否删除垃圾图片 (default: {True})
-        max_rank {int} -- [description] (default: {50})
-        output_dir {str} -- 输出目录。若为空则不输出。 (default: {''})
-
-    Returns:
-        [type] -- [description]
-    """
     metric = Clck_R1_mAP(query_length, max_rank=max_rank, rerank=rerank, remove_junk=remove_junk, feat_norm=feat_norm,
-                         output_path=output_dir, alpha=conf.getfloat('reid', 'ALPHA'), beta=conf.getfloat('reid', 'BETA'),
-                         lamda1=conf.getfloat('reid', 'LAMBDA1'), lamda2=conf.getfloat('reid', 'LAMBDA2'))
+                         output_path=output_dir, alpha=conf.getfloat('reid', 'ALPHA'),
+                         beta=conf.getfloat('reid', 'BETA'),
+                         lambda1=conf.getfloat('reid', 'LAMBDA1'), lambda2=conf.getfloat('reid', 'LAMBDA2'))
     [model.eval() for model in models]
     processbar_singal = kwargs.get('signals', None)[0]
     with torch.no_grad():
@@ -152,7 +137,7 @@ def eval_(models,
     info_signal = kwargs.get('signals', None)[1]
     metric.save(f'{output_dir}/test_features.pkl')
 
-    metric_output = metric.compute(split=split, infer_flag=kwargs['infer_flag'])
+    metric_output = metric.compute(split=split, infer_flag=conf.getboolean('default', 'infer_flag'))
     info_signal.emit(f'重识别结果已写入{output_dir}/test_output.pkl')
     processbar_singal.emit(100)
     if not kwargs['infer_flag']:
@@ -216,7 +201,7 @@ def inference(conf: configparser.ConfigParser, cfg, signals=None):
                                                                     test_ext=cfg.data.test_ext,
                                                                     re_prob=cfg.data.re_prob,
                                                                     with_mask=cfg.data.with_mask,
-                                                                    infer_flag=cfg.test.infer_flag
+                                                                    infer_flag=conf.getboolean('default', 'infer_flag')
                                                                     )
     valid_loader = DataLoader(valid_dataset,
                               batch_size=cfg.data.batch_size,
@@ -231,8 +216,8 @@ def inference(conf: configparser.ConfigParser, cfg, signals=None):
                     remove_junk=cfg.test.remove_junk,
                     max_rank=cfg.test.max_rank,
                     output_dir=conf.get('reid', 'OUTPUT'),
-                    lambda_=cfg.test.lambda_,
+                    conf=conf,
                     rerank=cfg.test.rerank,
                     split=cfg.test.split,
                     output_html_path=cfg.test.output_html_path,
-                    infer_flag=cfg.test.infer_flag, signals=signals)
+                    signals=signals)

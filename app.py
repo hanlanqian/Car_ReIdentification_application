@@ -2,14 +2,16 @@ import sys
 import os
 import shutil
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QGraphicsScene, QMessageBox, QStyleFactory, QWidget
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QCloseEvent
+from PyQt5.QtCore import Qt
 from Big_creation_UI import Ui_MainWindow
 from config import Ui_Form
 from threads import process_video_thread, reid_thread, show_result_thread
 import configparser
 
 conf = configparser.ConfigParser()
-conf.read('./app.conf')
+conf_path = './app.conf'
+conf.read(conf_path)
 
 
 class Mymain(QMainWindow, Ui_MainWindow):
@@ -22,7 +24,6 @@ class Mymain(QMainWindow, Ui_MainWindow):
         self.setStyle(QStyleFactory.create('Fusion'))
         self.init_ui()
         self.threads = []
-        # self.configwindow = ConfigWindow()
         with open('./AppStyleSheet.css', 'r') as f:
             self.setStyleSheet(f.read())
 
@@ -39,6 +40,7 @@ class Mymain(QMainWindow, Ui_MainWindow):
         self.ui.actionSetting.triggered.connect(self.setting)
 
     def setting(self):
+        self.config_window.init_setting()
         self.config_window.show()
 
     def process_video_button(self):
@@ -138,6 +140,18 @@ class Mymain(QMainWindow, Ui_MainWindow):
         else:
             QMessageBox.warning(self, '错误', '结果文件不存在')
 
+    def closeEvent(self, a0: QCloseEvent) -> None:
+        reply = QMessageBox.question(self,
+                                     '本程序',
+                                     "是否要退出程序？",
+                                     QMessageBox.Yes | QMessageBox.No,
+                                     QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.config_window.close()
+            a0.accept()
+        else:
+            a0.ignore()
+
 
 class ConfigWindow(QWidget, Ui_Form):
     def __init__(self):
@@ -145,7 +159,6 @@ class ConfigWindow(QWidget, Ui_Form):
         self.setObjectName('ConfigWindow')
         self.ui = Ui_Form()
         self.ui.setupUi(self)
-        self.init_setting()
         self.setStyle(QStyleFactory.create('Fusion'))
         self.init_ui()
 
@@ -153,8 +166,8 @@ class ConfigWindow(QWidget, Ui_Form):
         self.ui.pushButton.clicked.connect(self.save_setting)
         self.ui.horizontalSlider.valueChanged.connect(lambda: self.show_value(self.ui.label_9))
         self.ui.horizontalSlider_2.valueChanged.connect(lambda: self.show_value(self.ui.label_10))
-        self.ui.pushButton_2.clicked.connect(lambda: self.choose_path(self.ui.label_12))
-        self.ui.pushButton_5.clicked.connect(lambda: self.choose_path(self.ui.label_18))
+        self.ui.pushButton_2.clicked.connect(lambda: self.choose_folder(self.ui.label_12))
+        self.ui.pushButton_5.clicked.connect(lambda: self.choose_folder(self.ui.label_18))
         self.ui.pushButton_3.clicked.connect(lambda: self.choose_path(self.ui.label_14))
         self.ui.pushButton_4.clicked.connect(lambda: self.choose_path(self.ui.label_16))
 
@@ -165,13 +178,16 @@ class ConfigWindow(QWidget, Ui_Form):
         path, flag = QFileDialog.getSaveFileName()
         label.setText(path)
 
+    def choose_folder(self, label):
+        dirs = QFileDialog.getExistingDirectory()
+        label.setText(dirs)
 
     def save_setting(self):
         conf.set('video_process', 'DEVICE', self.ui.comboBox.currentText())
-        conf.set('video_process', 'FRAME_INTERVAL', int(self.ui.lineEdit.text()))
-        conf.set('video_process', 'IMAGE_SIZE', int(self.ui.lineEdit_2.text()))
-        conf.set('video_process', 'CONF_THRES', self.ui.horizontalSlider_2.value() / 100)
-        conf.set('video_process', 'IOU_THRES', self.ui.horizontalSlider.value() / 100)
+        conf.set('video_process', 'FRAME_INTERVAL', str(int(self.ui.lineEdit.text())))
+        conf.set('video_process', 'IMAGE_SIZE', str(int(self.ui.lineEdit_2.text())))
+        conf.set('video_process', 'CONF_THRES', str(self.ui.horizontalSlider_2.value() / 100))
+        conf.set('video_process', 'IOU_THRES', str(self.ui.horizontalSlider.value() / 100))
         conf.set('video_process', 'OUTPUT', self.ui.label_12.text())
 
         conf.set('reid', 'PKL_PATH', self.ui.label_14.text())
@@ -183,7 +199,12 @@ class ConfigWindow(QWidget, Ui_Form):
         conf.set('reid', 'LAMBDA2', self.ui.lineEdit_4.text())
 
         conf.set('default', 'PLOT_DPI', self.ui.lineEdit_7.text())
-        conf.write('./app.conf')
+        if self.ui.checkBox.checkState() == Qt.Checked:
+            conf.set('default', 'INFER_FLAG', 'yes')
+        else:
+            conf.set('default', 'INFER_FLAG', 'no')
+        with open('./app.conf', 'w') as f:
+            conf.write(f)
         QMessageBox.information(self, '信息', '配置保存成功！')
 
     def init_setting(self):
@@ -201,6 +222,10 @@ class ConfigWindow(QWidget, Ui_Form):
         self.ui.lineEdit_5.setText(conf.get('reid', 'LAMBDA1'))
         self.ui.lineEdit_4.setText(conf.get('reid', 'LAMBDA2'))
         self.ui.lineEdit_7.setText(conf.get('default', 'PLOT_DPI'))
+        if conf.getboolean('default', 'INFER_FLAG'):
+            self.ui.checkBox.setCheckState(Qt.Checked)
+        else:
+            self.ui.checkBox.setCheckState(Qt.Unchecked)
 
 
 if __name__ == '__main__':

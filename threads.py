@@ -8,7 +8,7 @@ import configparser
 import os
 
 conf = configparser.ConfigParser()
-conf.read('./app.conf')
+conf_path = './app.conf'
 
 
 class process_video_thread(QThread):
@@ -21,6 +21,7 @@ class process_video_thread(QThread):
         self.camera_id = camera_id
 
     def run(self) -> None:
+        conf.read(conf_path)
         self.info_signal.emit("处理视频线程已启动")
         process_video(self.fname, conf, [self.process_video_signal, self.info_signal], self.camera_id,
                       num=conf.getint('video_process', 'FRAME_INTERVAL'))
@@ -34,6 +35,7 @@ class reid_thread(QThread):
         super(reid_thread, self).__init__()
 
     def run(self) -> None:
+        conf.read(conf_path)
         self.info_signal.emit("重识别线程已启动")
         inference(conf, cfg, [self.process_video_signal, self.info_signal])
 
