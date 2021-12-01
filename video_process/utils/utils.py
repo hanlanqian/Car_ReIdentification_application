@@ -874,11 +874,6 @@ def apply_classifier(x, model, img, im0):
                 cutout = im0[i][int(a[1]):int(a[3]), int(a[0]):int(a[2])]
                 im = cv2.resize(cutout, (94, 24))  # BGR
                 im = transform(im)
-                cv2.imwrite('test%s.jpg' % j, cutout)
-
-                # im = im[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
-                # im = np.ascontiguousarray(im, dtype=np.float32)  # uint8 to float32
-                # im /= 255.0  # 0 - 255 to 0.0 - 1.0
                 ims.append(im)
 
             preds = model(torch.Tensor(ims).to(d.device))  # classifier prediction

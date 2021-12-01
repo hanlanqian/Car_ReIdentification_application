@@ -46,7 +46,7 @@ def eval_func(distmat, q_pids, g_pids, q_camids, g_camids, max_rank=50, remove_j
 
         # compute cmc curve
         # binary vector, positions with value 1 are correct matches
-    #     orig_cmc = matches[q_idx][keep]
+        #     orig_cmc = matches[q_idx][keep]
         orig_cmc = (g_pids[order] == q_pid).astype(np.int32)[keep]
         if not np.any(orig_cmc):
             # this condition is true when query identity does not appear in gallery
@@ -107,10 +107,9 @@ def eval_func_mp(distmat, q_pids, g_pids, q_camids, g_camids, max_rank=50, remov
         all_AP.append(r[0])
         all_cmc.append(r[1])
 
-
     # num_valid_q = 0.  # number of valid query
     # for q_idx in tqdm(range(num_q), desc='Calc cmc and mAP'):
-        # get query pid and camid
+    # get query pid and camid
     # assert num_valid_q > 0, "Error: all query identities do not appear in gallery"
 
     all_cmc = np.asarray(all_cmc).astype(np.float32)
@@ -118,6 +117,7 @@ def eval_func_mp(distmat, q_pids, g_pids, q_camids, g_camids, max_rank=50, remov
     mAP = np.mean(all_AP)
 
     return all_cmc, mAP, all_AP
+
 
 def worker(args):
     q_pid, q_camid, g_pids, g_camids, dist_vec, max_rank, remove_junk = args
@@ -131,10 +131,11 @@ def worker(args):
 
     # compute cmc curve
     # binary vector, positions with value 1 are correct matches
-#     orig_cmc = matches[q_idx][keep]
+    #     orig_cmc = matches[q_idx][keep]
     orig_cmc = (g_pids[order] == q_pid).astype(np.int32)[keep]
     AP, cmc = calc_AP(orig_cmc)
     return AP, cmc[:max_rank]
+
 
 def eval_func_th(distmat, q_pids, g_pids, q_camids, g_camids, max_rank=50, remove_junk=True):
     """Evaluation with veri776 metric
@@ -172,7 +173,7 @@ def eval_func_th(distmat, q_pids, g_pids, q_camids, g_camids, max_rank=50, remov
 
         # compute cmc curve
         # binary vector, positions with value 1 are correct matches
-    #     orig_cmc = matches[q_idx][keep]
+        #     orig_cmc = matches[q_idx][keep]
         orig_cmc = (g_pids[order] == q_pid).astype(np.int32)[keep]
         if not np.any(orig_cmc):
             # this condition is true when query identity does not appear in gallery
@@ -201,6 +202,7 @@ def eval_func_th(distmat, q_pids, g_pids, q_camids, g_camids, max_rank=50, remov
 
     return all_cmc, mAP
 
+
 def calc_AP(orig_cmc):
     """Evaluation
 
@@ -222,6 +224,7 @@ def calc_AP(orig_cmc):
     tmp_cmc = np.asarray(tmp_cmc) * orig_cmc  # on Recall changed
     AP = tmp_cmc.sum() / num_rel
     return AP, cmc
+
 
 def get_expectation_of_AP(N=10, T=3):
     """

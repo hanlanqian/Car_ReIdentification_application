@@ -96,5 +96,8 @@ cfg.logging.period = 20
 cfg.encoder = 'se_resnext50_32x4d'
 cfg.encoder_weights = 'imagenet'
 
-
+## eval part
+cfg.eval = CfgNode()
+cfg.eval.pkl_file = ''
+cfg.eval.output = './outputs/'
 

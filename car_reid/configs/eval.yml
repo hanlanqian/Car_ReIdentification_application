@@ -1,0 +1,3 @@
+eval:
+  pkl_file: './outputs/eval.pkl'
+  output: './outputs/'

@@ -23,6 +23,8 @@ def clck_dist(feat1, feat2, vis_score1, vis_score2, split=0):
     :rtype torch.Tensor
     :return: clck distance. [B1, B2]
     """
+    vis_score1 = torch.exp(vis_score1)
+    vis_score2 = torch.exp(vis_score2)
 
     B, C, N = feat1.shape
     dist_mat = 0
@@ -41,15 +43,16 @@ def clck_dist(feat1, feat2, vis_score1, vis_score2, split=0):
 
 def calculate_feature_distance(feat1, feat2):
     m, n, color_num = feat1.shape[0], feat2.shape[0], feat1.shape[1]
-    color_distmat = torch.pow(feat1, 2).sum(dim=1, keepdim=True).expand(m, n) + torch.pow(feat2, 2).sum(dim=1, keepdim=True).expand(n, m).t()
+    color_distmat = torch.pow(feat1, 2).sum(dim=1, keepdim=True).expand(m, n) + torch.pow(feat2, 2).sum(dim=1,
+                                                                                                        keepdim=True).expand(
+        n, m).t()
     color_distmat.addmm_(feat1, feat2.t(), beta=1, alpha=-2)
     return color_distmat.detach().cpu().numpy()
 
 
-
 class Clck_R1_mAP:
     def __init__(self, num_query, *, max_rank=50, feat_norm=True, output_path='', rerank=False, remove_junk=True,
-                 lambda_=0.5):
+                 alpha=1, beta=0.5, lambda1=0, lambda2=0):
         """
         计算VPM中的可见性距离并计算性能
 
@@ -68,7 +71,10 @@ class Clck_R1_mAP:
         self.output_path = output_path
         self.rerank = rerank
         self.remove_junk = remove_junk
-        self.lambda_ = lambda_
+        self.alpha = alpha
+        self.beta = beta
+        self.lambda1 = lambda1
+        self.lambda2 = lambda2
         self.reset()
 
     def reset(self):
@@ -143,22 +149,18 @@ class Clck_R1_mAP:
         self.paths = [self.paths[i] for i in re_idxs]
 
     def compute(self, split=0, **kwargs):
-        """
-        split: When the CUDA memory is not sufficient, we can split the dataset into different parts
-               for the computing of distance.
-        """
         global_feats = torch.stack(self.global_feats, dim=0)
         local_feats = torch.stack(self.local_feats, dim=0)
         vis_scores = torch.stack(self.vis_scores)
         color_feature = torch.stack(self.color_feature, dim=0)
         vehicle_type_feature = torch.stack(self.vehicle_type_feature, dim=0)
         if self.feat_norm:
-            print("The test feature is normalized")
+            print("The feature is normalized")
             global_feats = F.normalize(global_feats, dim=1, p=2)
             local_feats = F.normalize(local_feats, dim=1, p=2)
             color_feature = F.normalize(color_feature, dim=1, p=2)
             vehicle_type_feature = F.normalize(vehicle_type_feature, dim=1, p=2)
-
+            vis_scores = F.normalize(vis_scores, dim=1, p=2)
         # 全局距离
         print('Calculate distance matrixs...')
         # query
@@ -212,9 +214,10 @@ class Clck_R1_mAP:
         # 颜色距离
         print('Calculate color distances.....')
         color_distmat = calculate_feature_distance(color_feature[:self.num_query], color_feature[self.num_query:])
-        # color = color_feature.argmax(dim=)
         # 车型距离
-        vehicle_type_distmat = calculate_feature_distance(vehicle_type_feature[:self.num_query], vehicle_type_feature[self.num_query:])
+        vehicle_type_distmat = calculate_feature_distance(vehicle_type_feature[:self.num_query],
+                                                          vehicle_type_feature[self.num_query:])
+        final_dismat = distmat * self.alpha + local_distmat * self.beta + color_distmat * self.lambda1 + vehicle_type_distmat * self.lambda2
         if self.output_path:
             print('Saving results...')
             outputs = {
@@ -231,14 +234,14 @@ class Clck_R1_mAP:
                 "local_distmat": local_distmat,
                 "color_distmat": color_distmat,
                 "vehicle_type_distmat": vehicle_type_distmat,
+                "final_dismat": final_dismat
             }
             torch.save(outputs, os.path.join(self.output_path,
                                              'test_output.pkl'), pickle_protocol=4)
 
         if not kwargs['infer_flag']:
             print('Eval...')
-            cmc, mAP, all_AP = eval_func_mp(distmat + self.lambda_ * (local_distmat ** 2), q_pids, g_pids, q_camids,
-                                            g_camids,
+            cmc, mAP, all_AP = eval_func_mp(final_dismat, q_pids, g_pids, q_camids, g_camids,
                                             remove_junk=self.remove_junk)
 
             return {
@@ -249,3 +252,6 @@ class Clck_R1_mAP:
             }
         else:
             return outputs
+
+    def sort(self):
+        pass
