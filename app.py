@@ -151,17 +151,19 @@ class ConfigWindow(QWidget, Ui_Form):
 
     def init_ui(self):
         self.ui.pushButton.clicked.connect(self.save_setting)
-        self.ui.horizontalSlider.valueChanged.connect(self.show_value)
-        self.ui.horizontalSlider_2.valueChanged.connect(self.show_value_2)
+        self.ui.horizontalSlider.valueChanged.connect(lambda: self.show_value(self.ui.label_9))
+        self.ui.horizontalSlider_2.valueChanged.connect(lambda: self.show_value(self.ui.label_10))
+        self.ui.pushButton_2.clicked.connect(lambda: self.choose_path(self.ui.label_12))
+        self.ui.pushButton_5.clicked.connect(lambda: self.choose_path(self.ui.label_18))
+        self.ui.pushButton_3.clicked.connect(lambda: self.choose_path(self.ui.label_14))
+        self.ui.pushButton_4.clicked.connect(lambda: self.choose_path(self.ui.label_16))
 
-    def show_value(self):
-        self.ui.label_9.setText(str(self.sender().value()/100))
+    def show_value(self, label):
+        label.setText(str(self.sender().value() / 100))
 
-    def show_value_2(self):
-        self.ui.label_10.setText(str(self.sender().value() / 100))
-
-    def choose_path(self, ):
+    def choose_path(self, label):
         path, flag = QFileDialog.getSaveFileName()
+        label.setText(path)
 
 
     def save_setting(self):
