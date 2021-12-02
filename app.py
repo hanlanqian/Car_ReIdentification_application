@@ -195,8 +195,8 @@ class ConfigWindow(QWidget, Ui_Form):
         conf.set('reid', 'OUTPUT', self.ui.label_18.text())
         conf.set('reid', 'ALPHA', self.ui.lineEdit_3.text())
         conf.set('reid', 'BETA', self.ui.lineEdit_6.text())
-        conf.set('reid', 'LAMBDA1', self.ui.lineEdit_5.text())
-        conf.set('reid', 'LAMBDA2', self.ui.lineEdit_4.text())
+        conf.set('reid', 'LAMBDA2', self.ui.lineEdit_5.text())
+        conf.set('reid', 'LAMBDA1', self.ui.lineEdit_4.text())
 
         conf.set('default', 'PLOT_DPI', self.ui.lineEdit_7.text())
         if self.ui.checkBox.checkState() == Qt.Checked:
@@ -219,8 +219,8 @@ class ConfigWindow(QWidget, Ui_Form):
         self.ui.label_18.setText(conf.get('reid', 'OUTPUT'))
         self.ui.lineEdit_3.setText(conf.get('reid', 'ALPHA'))
         self.ui.lineEdit_6.setText(conf.get('reid', 'BETA'))
-        self.ui.lineEdit_5.setText(conf.get('reid', 'LAMBDA1'))
-        self.ui.lineEdit_4.setText(conf.get('reid', 'LAMBDA2'))
+        self.ui.lineEdit_5.setText(conf.get('reid', 'LAMBDA2'))
+        self.ui.lineEdit_4.setText(conf.get('reid', 'LAMBDA1'))
         self.ui.lineEdit_7.setText(conf.get('default', 'PLOT_DPI'))
         if conf.getboolean('default', 'INFER_FLAG'):
             self.ui.checkBox.setCheckState(Qt.Checked)

@@ -3,8 +3,8 @@ import shutil
 import numpy as np
 import random
 
-dataset_path = r"C:\Users\hanlanqian\Desktop\车辆重识别\test\TEST"
-output = r"C:\Users\hanlanqian\Desktop\车辆重识别\test_processed"
+dataset_path = r"C:\Users\hanlanqian\Desktop\car_reid\test\TEST"
+output = r"C:\Users\hanlanqian\Desktop\car_reid\test_processed"
 current_dirs = True
 query_num = 20
 
