@@ -247,7 +247,7 @@ class Clck_R1_mAP:
             return {
                 "cmc": cmc,
                 "mAP": mAP,
-                "distmat": distmat,
+                "final_distmat": final_dismat,
                 "all_AP": all_AP
             }
         else:
