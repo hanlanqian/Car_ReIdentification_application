@@ -19,7 +19,6 @@ class CommonReIDDataset(ReIDMetaDataset):
         """
         test_ext: For VehicleID and VERIWild, there are multi test sets. Pass the test ext to select which one to use.
         """
-        self.train = metas["train"] if not kwargs['infer'] else dict({})
         self.query = metas["query" + str(test_ext)]
         self.gallery = metas["gallery" + str(test_ext)]
 
@@ -29,6 +28,5 @@ class CommonReIDDataset(ReIDMetaDataset):
             print("=> Dataset loaded")
             self.print_dataset_statistics()
 
-        self.num_train_ids, self.num_train_imgs, self.num_train_cams = get_imagedata_info(self.train)
         self.num_query_ids, self.num_query_imgs, self.num_query_cams = get_imagedata_info(self.query)
         self.num_gallery_ids, self.num_gallery_imgs, self.num_gallery_cams = get_imagedata_info(self.gallery)

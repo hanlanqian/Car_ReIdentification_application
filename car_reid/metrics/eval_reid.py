@@ -89,7 +89,7 @@ def eval_func_mp(distmat, q_pids, g_pids, q_camids, g_camids, max_rank=50, remov
     all_AP = []
     print('Generating worker pools')
     t1 = time.time()
-    pool = Pool(30)
+    pool = Pool(1)
     res = pool.imap(worker, [
         (
             q_pids[q_idx],

@@ -44,17 +44,17 @@ def mask_predict(model, test_dataset, test_dataset_vis, output_path, flag, proce
 
         ## 重复图片直接用之前计算好的即可
         image_path = Path(extra["image_path"])
-        if str(image_path) in IMG2MASK:
-            extra["mask_path"] = str(IMG2MASK[str(image_path)])
-            continue
+        # if str(image_path) in IMG2MASK:
+        #     extra["mask_path"] = str(IMG2MASK[str(image_path)])
+        #     continue
         mask_path = output_path / f"{image_path.name.split('.')[0]}.png"
-
-        x_tensor = torch.from_numpy(image).to("cuda").unsqueeze(0)
-        with torch.no_grad():
-            pr_mask = model.predict(x_tensor)
-        pr_map = pr_mask.squeeze().cpu().numpy().round()
-        pr_map = np.argmax(pr_map, axis=0)[:image_vis.shape[0], :image_vis.shape[1]]
-        cv2.imwrite(str(mask_path), pr_map.astype(np.uint8))
+        #
+        # x_tensor = torch.from_numpy(image).to("cuda").unsqueeze(0)
+        # with torch.no_grad():
+        #     pr_mask = model.predict(x_tensor)
+        # pr_map = pr_mask.squeeze().cpu().numpy().round()
+        # pr_map = np.argmax(pr_map, axis=0)[:image_vis.shape[0], :image_vis.shape[1]]
+        # cv2.imwrite(str(mask_path), pr_map.astype(np.uint8))
         extra["mask_path"] = str(mask_path)
 
         IMG2MASK[str(image_path)] = str(mask_path)
@@ -143,19 +143,12 @@ def eval_(models,
     if not kwargs['infer_flag']:
         cmc = metric_output['cmc']
         mAP = metric_output['mAP']
-        distmat = metric_output['distmat']
+        final_distmat = metric_output['final_distmat']
         all_AP = metric_output['all_AP']
-
-        if output_html_path != '':
-            from reid_utils.visualize import reid_html_table
-            query = valid_loader.dataset.meta_dataset[:query_length]
-            gallery = valid_loader.dataset.meta_dataset[query_length:]
-            reid_html_table(query, gallery, distmat, output_html_path, all_AP, topk=15)
-
         metric.reset()
-        logger.info(f"mAP: {mAP:.2%}")
+        info_signal.emit(f"mAP: {mAP:.2%}")
         for r in [1, 5, 10]:
-            logger.info(f"CMC curve, Rank-{r:<3}:{cmc[r - 1]:.2%}")
+            info_signal.emit(f"CMC curve, Rank-{r:<3}:{cmc[r - 1]:.2%}")
         return cmc, mAP
     else:
         return metric_output.get('distmat')
@@ -194,15 +187,15 @@ def inference(conf: configparser.ConfigParser, cfg, signals=None):
     models_weight_load(cfg, models)
 
     ## 创建数据集模型
-    train_dataset, valid_dataset, meta_dataset = make_basic_dataset(metas,
-                                                                    cfg.data.train_size,
-                                                                    cfg.data.valid_size,
-                                                                    cfg.data.pad,
-                                                                    test_ext=cfg.data.test_ext,
-                                                                    re_prob=cfg.data.re_prob,
-                                                                    with_mask=cfg.data.with_mask,
-                                                                    infer_flag=conf.getboolean('default', 'infer_flag')
-                                                                    )
+    valid_dataset, meta_dataset = make_basic_dataset(metas,
+                                                     cfg.data.train_size,
+                                                     cfg.data.valid_size,
+                                                     cfg.data.pad,
+                                                     test_ext=cfg.data.test_ext,
+                                                     re_prob=cfg.data.re_prob,
+                                                     with_mask=cfg.data.with_mask,
+                                                     infer_flag=conf.getboolean('default', 'infer_flag')
+                                                     )
     valid_loader = DataLoader(valid_dataset,
                               batch_size=cfg.data.batch_size,
                               num_workers=cfg.data.test_num_workers,
