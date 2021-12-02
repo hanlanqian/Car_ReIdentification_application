@@ -44,17 +44,17 @@ def mask_predict(model, test_dataset, test_dataset_vis, output_path, flag, proce
 
         ## 重复图片直接用之前计算好的即可
         image_path = Path(extra["image_path"])
-        # if str(image_path) in IMG2MASK:
-        #     extra["mask_path"] = str(IMG2MASK[str(image_path)])
-        #     continue
+        if str(image_path) in IMG2MASK:
+            extra["mask_path"] = str(IMG2MASK[str(image_path)])
+            continue
         mask_path = output_path / f"{image_path.name.split('.')[0]}.png"
         #
-        # x_tensor = torch.from_numpy(image).to("cuda").unsqueeze(0)
-        # with torch.no_grad():
-        #     pr_mask = model.predict(x_tensor)
-        # pr_map = pr_mask.squeeze().cpu().numpy().round()
-        # pr_map = np.argmax(pr_map, axis=0)[:image_vis.shape[0], :image_vis.shape[1]]
-        # cv2.imwrite(str(mask_path), pr_map.astype(np.uint8))
+        x_tensor = torch.from_numpy(image).to("cuda").unsqueeze(0)
+        with torch.no_grad():
+            pr_mask = model.predict(x_tensor)
+        pr_map = pr_mask.squeeze().cpu().numpy().round()
+        pr_map = np.argmax(pr_map, axis=0)[:image_vis.shape[0], :image_vis.shape[1]]
+        cv2.imwrite(str(mask_path), pr_map.astype(np.uint8))
         extra["mask_path"] = str(mask_path)
 
         IMG2MASK[str(image_path)] = str(mask_path)
@@ -103,6 +103,7 @@ def models_weight_load(cfg, models):
 def eval_(models,
           device,
           valid_loader,
+          meta_dataset,
           query_length,
           feat_norm=True,
           remove_junk=True,
@@ -135,12 +136,11 @@ def eval_(models,
                            batch["cam"].cpu(), batch["image_path"], color_output, vehicle_type_output))
 
     info_signal = kwargs.get('signals', None)[1]
-    metric.save(f'{output_dir}/test_features.pkl')
-
-    metric_output = metric.compute(split=split, infer_flag=conf.getboolean('default', 'infer_flag'))
+    metric_output = metric.compute(split=split, infer_flag=conf.getboolean('default', 'infer_flag'),
+                                   pid2rawid=meta_dataset.eval_label2rawid)
     info_signal.emit(f'重识别结果已写入{output_dir}/test_output.pkl')
-    processbar_singal.emit(100)
-    if not kwargs['infer_flag']:
+
+    if not conf.getboolean('default', 'INFER_FLAG'):
         cmc = metric_output['cmc']
         mAP = metric_output['mAP']
         final_distmat = metric_output['final_distmat']
@@ -149,8 +149,10 @@ def eval_(models,
         info_signal.emit(f"mAP: {mAP:.2%}")
         for r in [1, 5, 10]:
             info_signal.emit(f"CMC curve, Rank-{r:<3}:{cmc[r - 1]:.2%}")
+        processbar_singal.emit(100)
         return cmc, mAP
     else:
+        processbar_singal.emit(100)
         return metric_output.get('distmat')
 
 
@@ -158,7 +160,7 @@ def inference(conf: configparser.ConfigParser, cfg, signals=None):
     cfg = merge_configs(cfg, conf.get('reid', 'CONFIG_FILE'))
     os.makedirs(conf.get('reid', 'OUTPUT'), exist_ok=True)
     signals[1].emit("开始生成数据集信息pkl文件")
-    metas = veri776(conf.get('video_process', 'OUTPUT'), conf.get('reid', 'PKL_PATH'), inference=True)
+    metas = veri776(conf.get('video_process', 'OUTPUT'), conf.get('reid', 'PKL_PATH'), train=False)
 
     signals[1].emit('开始生成图像masks')
     #### Stage one: generate masks ####
@@ -188,7 +190,6 @@ def inference(conf: configparser.ConfigParser, cfg, signals=None):
 
     ## 创建数据集模型
     valid_dataset, meta_dataset = make_basic_dataset(metas,
-                                                     cfg.data.train_size,
                                                      cfg.data.valid_size,
                                                      cfg.data.pad,
                                                      test_ext=cfg.data.test_ext,
@@ -204,9 +205,9 @@ def inference(conf: configparser.ConfigParser, cfg, signals=None):
 
     query_length = meta_dataset.num_query_imgs
     signals[1].emit("开始进行重识别推理.....")
-    outputs = eval_(models, cfg.test.device, valid_loader, query_length,
+    outputs = eval_(models, cfg.test.device, valid_loader, meta_dataset, query_length,
                     feat_norm=cfg.test.feat_norm,
-                    remove_junk=cfg.test.remove_junk,
+                    remove_junk=conf.getboolean('reid', 'remove_junk'),
                     max_rank=cfg.test.max_rank,
                     output_dir=conf.get('reid', 'OUTPUT'),
                     conf=conf,

@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 
 
-def veri776(input_path, output_path, inference):
+def veri776(input_path, output_path, train):
     input_path = os.path.abspath(input_path)
     output_dir, output_filename = os.path.split(output_path)
     if output_dir != '' and not os.path.exists(output_dir):
@@ -15,7 +15,7 @@ def veri776(input_path, output_path, inference):
     output_dict = {}
 
     pattern = re.compile(r"(\d+)_(\d+)_c(\d+).*\.jpg")
-    if not inference:
+    if train:
         dir_set = ["train", "query", "gallery"]
     else:
         dir_set = ['query', 'gallery']
