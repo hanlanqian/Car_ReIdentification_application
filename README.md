@@ -1,4 +1,4 @@
-# Car_ReIdentification_application
+# Car_ReIdentification_Application
 
 ## Technology Stack
 
@@ -57,3 +57,7 @@
 ## Running
 
 1. `python app.py`
+
+## Evaluation
+
+1. 在设置界面打开评估模式
