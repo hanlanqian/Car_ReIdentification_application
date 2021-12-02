@@ -226,6 +226,10 @@ class ConfigWindow(QWidget, Ui_Form):
             self.ui.checkBox.setCheckState(Qt.Checked)
         else:
             self.ui.checkBox.setCheckState(Qt.Unchecked)
+        if conf.getboolean('reid', 'remove_junk'):
+            self.ui.checkBox_2.setCheckState(Qt.Checked)
+        else:
+            self.ui.checkBox_2.setCheckState(Qt.Unchecked)
 
 
 if __name__ == '__main__':

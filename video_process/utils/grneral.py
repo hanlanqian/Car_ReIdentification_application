@@ -107,7 +107,7 @@ def check_anchors(dataset, model, thr=4.0, imgsz=640):
         new_bpr = metric(new_anchors.reshape(-1, 2))[0]
         if new_bpr > bpr:  # replace anchors
             new_anchors = torch.tensor(new_anchors, device=m.anchors.device).type_as(m.anchors)
-            m.anchor_grid[:] = new_anchors.clone().view_as(m.anchor_grid)  # for inference
+            m.anchor_grid[:] = new_anchors.clone().view_as(m.anchor_grid)  # for train
             m.anchors[:] = new_anchors.clone().view_as(m.anchors) / m.stride.to(m.anchors.device).view(-1, 1, 1)  # loss
             check_anchor_order(m)
             print('New anchors saved to model. Update model *.yaml to use these anchors in the future.')
@@ -603,7 +603,7 @@ def build_targets(p, targets, model):
 
 
 def non_max_suppression(prediction, conf_thres=0.1, iou_thres=0.6, merge=False, classes=None, agnostic=False):
-    """Performs Non-Maximum Suppression (NMS) on inference results
+    """Performs Non-Maximum Suppression (NMS) on train results
 
     Returns:
          detections with shape: nx6 (x1, y1, x2, y2, conf, cls)
@@ -622,7 +622,7 @@ def non_max_suppression(prediction, conf_thres=0.1, iou_thres=0.6, merge=False, 
 
     t = time.time()
     output = [None] * prediction.shape[0]
-    for xi, x in enumerate(prediction):  # image index, image inference
+    for xi, x in enumerate(prediction):  # image index, image train
         # Apply constraints
         # x[((x[..., 2:4] < min_wh) | (x[..., 2:4] > max_wh)).any(1), 4] = 0  # width-height
         x = x[xc[xi]]  # confidence

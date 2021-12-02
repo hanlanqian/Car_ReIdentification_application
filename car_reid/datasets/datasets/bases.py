@@ -58,6 +58,7 @@ class ReIDMetaDataset:
         "view"(optional): extra information
     }
     """
+
     def __init__(self, pkl_path, verbose=True, **kwargs):
         with open(pkl_path, 'rb') as f:
             metas = pkl.load(f)
@@ -122,22 +123,12 @@ class ReIDDataset(Dataset):
         mask = np.stack(mask, axis=-1).astype('float32')
         sample["mask"] = mask
 
-
     def __getitem__(self, item):
         meta: dict = self.meta_dataset[item]
         sample = meta.copy()
         # 读入图片
 
-        ######## TODO: Remove this before commit
-        idx = sample["image_path"].find('/home/aa')
-        if idx != -1:
-            sample["image_path"] = '/data1/dechao_meng/' + sample["image_path"][idx + 8:] 
-            sample["mask_path"] = '/data1/dechao_meng/' + sample["mask_path"][idx + 8:] 
-        ###################################
-
-
         sample["image"] = read_rgb_image(sample["image_path"])
-
 
         # 读入mask
         if self.with_mask:
@@ -150,7 +141,7 @@ class ReIDDataset(Dataset):
         # preprocessing
         if self.preprocessing:
             sample = self.preprocessing(**sample)
-        
+
         return sample
 
     def __len__(self):

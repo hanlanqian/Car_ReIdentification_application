@@ -78,7 +78,7 @@ cfg.test.max_rank = 50
 cfg.test.rerank = False
 cfg.test.lambda_ = 0.0
 cfg.test.output_html_path = ""
-cfg.test.infer_flag = False  ## inference flag
+cfg.test.infer_flag = False  ## train flag
 # split: When the CUDA memory is not sufficient,
 # we can split the dataset into different parts
 # for the computing of distance.

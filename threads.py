@@ -48,6 +48,7 @@ class show_result_thread(QThread):
         self.rank_num = rank_num
 
     def run(self) -> None:
+        conf.read(conf_path)
         self.info_signal.emit("可视化结果线程已启动")
         image_path, image_query_path = N_rank(self.rank_num,
                                               os.path.join(conf.get('reid', 'OUTPUT'), 'test_output.pkl'))

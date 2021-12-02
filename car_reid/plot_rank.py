@@ -37,7 +37,7 @@ def N_rank(rank_num, pkl_path):
     image_path = []
     image_query_path = []
     file = torch.load(pkl_path)
-    _index = file['final_distmat'].argpartition(rank_num, axis=1)
+    _index = file['final_dismat'].argpartition(rank_num, axis=1)
 
     for j in range(rank_num):
         image_path.append([file['paths'][i + len(_index)] for i in _index[:, j]])

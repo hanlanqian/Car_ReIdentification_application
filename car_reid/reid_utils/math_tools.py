@@ -227,6 +227,7 @@ class Clck_R1_mAP:
                 "color_feature": self.color_feature,
                 "vehicle_type_feature": self.vehicle_type_feature,
                 "pids": self.pids,
+                "pid2rawid": kwargs.get('pid2rawid'),
                 "camids": self.camids,
                 "paths": self.paths,
                 "num_query": self.num_query,

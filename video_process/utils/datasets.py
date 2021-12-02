@@ -61,7 +61,7 @@ def create_dataloader(path, imgsz, batch_size, stride, opt, hyp=None, augment=Fa
     return dataloader, dataset
 
 
-class LoadImages:  # for inference
+class LoadImages:  # for train
     def __init__(self, path, img_size=640):
         path = str(Path(path))  # os-agnostic
         files = []
@@ -138,7 +138,7 @@ class LoadImages:  # for inference
         return self.nF  # number of files
 
 
-class LoadWebcam:  # for inference
+class LoadWebcam:  # for train
     def __init__(self, pipe=0, img_size=640):
         self.img_size = img_size
 
@@ -232,8 +232,8 @@ class LoadStreams:  # multiple IP or RTSP cameras
         print('')  # newline
 
         # check for common shapes
-        s = np.stack([letterbox(x, new_shape=self.img_size)[0].shape for x in self.imgs], 0)  # inference shapes
-        self.rect = np.unique(s, axis=0).shape[0] == 1  # rect inference if all shapes equal
+        s = np.stack([letterbox(x, new_shape=self.img_size)[0].shape for x in self.imgs], 0)  # train shapes
+        self.rect = np.unique(s, axis=0).shape[0] == 1  # rect train if all shapes equal
         if not self.rect:
             print('WARNING: Different stream shapes detected. For optimal performance supply similarly-shaped streams.')
 

@@ -36,7 +36,7 @@ class Detect(nn.Module):
 
     def forward(self, x):
         # x = x.copy()  # for profiling
-        z = []  # inference output
+        z = []  # train output
         # self.training |= self.export
         for i in range(self.nl):
             x[i] = self.m[i](x[i])  # conv
@@ -50,7 +50,7 @@ class Detect(nn.Module):
                 bs, _, ny, nx = x[i].shape  # x(bs,255,20,20) to x(bs,3,20,20,85)
                 x[i] = x[i].view(bs, self.na, self.no, ny, nx).permute(0, 1, 3, 4, 2).contiguous()
 
-            if not self.training or self.export:  # inference
+            if not self.training or self.export:  # train
                 if self.export:
                     self.grid = [i.to(x_i.device) for i in self.grid]
                     self.a = self.anchor_grid_awesome[i]
@@ -140,9 +140,9 @@ class Model(nn.Module):
                 elif fi == 3:
                     yi[..., 0] = img_size[1] - yi[..., 0]  # de-flip lr
                 y.append(yi)
-            return torch.cat(y, 1), None  # augmented inference, train
+            return torch.cat(y, 1), None  # augmented train, train
         else:
-            return self.forward_once(x, profile)  # single-scale inference, train
+            return self.forward_once(x, profile)  # single-scale train, train
 
     def forward_once(self, x, profile=False):
         y, dt = [], []  # outputs
