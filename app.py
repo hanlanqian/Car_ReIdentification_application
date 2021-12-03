@@ -1,7 +1,8 @@
 import sys
 import os
 import shutil
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QGraphicsScene, QMessageBox, QStyleFactory, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QGraphicsScene, QMessageBox, QStyleFactory, QWidget, \
+    QListView
 from PyQt5.QtGui import QPixmap, QCloseEvent
 from PyQt5.QtCore import Qt
 from Big_creation_UI import Ui_MainWindow
@@ -24,7 +25,7 @@ class Mymain(QMainWindow, Ui_MainWindow):
         self.setStyle(QStyleFactory.create('Fusion'))
         self.init_ui()
         self.threads = []
-        with open('./AppStyleSheet.css', 'r') as f:
+        with open('./AppStyleSheet.css', 'r', encoding='utf-8') as f:
             self.setStyleSheet(f.read())
 
     def init_ui(self):
@@ -38,6 +39,12 @@ class Mymain(QMainWindow, Ui_MainWindow):
         self.ui.pushButton.clicked.connect(self.add_query_vehicle)
         self.ui.progressBar.valueChanged.connect(self.check_processbar)
         self.ui.actionSetting.triggered.connect(self.setting)
+        list_view1 = QListView()
+        list_view2 = QListView()
+        list_view3 = QListView()
+        self.ui.comboBox.setView(list_view1)
+        self.ui.comboBox_2.setView(list_view2)
+        self.ui.comboBox_3.setView(list_view3)
 
     def setting(self):
         self.config_window.init_setting()
@@ -161,6 +168,8 @@ class ConfigWindow(QWidget, Ui_Form):
         self.ui.setupUi(self)
         self.setStyle(QStyleFactory.create('Fusion'))
         self.init_ui()
+        with open('./config.css', 'r', encoding='utf-8') as f:
+            self.setStyleSheet(f.read())
 
     def init_ui(self):
         self.ui.pushButton.clicked.connect(self.save_setting)
@@ -170,6 +179,8 @@ class ConfigWindow(QWidget, Ui_Form):
         self.ui.pushButton_5.clicked.connect(lambda: self.choose_folder(self.ui.label_18))
         self.ui.pushButton_3.clicked.connect(lambda: self.choose_path(self.ui.label_14))
         self.ui.pushButton_4.clicked.connect(lambda: self.choose_path(self.ui.label_16))
+        list_view = QListView()
+        self.ui.comboBox.setView(list_view)
 
     def show_value(self, label):
         label.setText(str(self.sender().value() / 100))

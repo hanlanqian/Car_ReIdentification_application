@@ -1,0 +1,112 @@
+#label, #label_2, #label_7 {
+    border-style: solid;
+    border-radius: 3px;
+    border-color: #00130f;
+    border-width: 1px;
+}
+
+#line, #line_2, #line_3, #line_4 {
+    color: rgb(216, 20, 20);
+}
+
+QComboBox {
+    font-size: 14px;
+    font-family: "Microsoft YaHei UI";
+}
+
+QLabel {
+    font-size: 14px;
+    font-family: "Microsoft YaHei UI";
+}
+
+QPushButton {
+    border: 2px solid #272727;
+    border-radius: 7px;
+    padding: 4px;
+    min-width: 90px;
+    min-height: 20px;
+}
+
+QPushButton:hover {
+    background-color: #0ff7ff;
+    border-color: #ffb27e;
+}
+
+QPushButton:pressed {
+    background-color: #0ff7ff;
+    border-color: #ff791f;
+    color: yellow;
+}
+
+QPushButton:disabled {
+    color: #333333;
+}
+
+QComboBox {
+    background-color: #f3f3f3;
+    border: 1px solid #69d3d1;
+    border-radius: 6px;
+    padding: 1px 2em 1px 3px;
+}
+
+QComboBox QAbstractItemView {
+    outline: 0px solid gray; /* 选定项的虚框 */
+    border: 1px solid #5fbdec; /* 整个下拉窗体的边框 */
+    border-radius: 6px;
+    background-color: #ffffff; /* 整个下拉窗体的背景色 */
+    selection-background-color: #5fbdec; /* 整个下拉窗体被选中项的背景色 */
+}
+
+QComboBox QAbstractItemView::item {
+    border: 1px solid lightgreen;
+    border: 5px;
+    font-size: 14px;
+    font-family: "Microsoft YaHei UI";
+}
+
+QComboBox QAbstractItemView::item:hover {
+    background-color: lightblue; /* 整个下拉窗体越过每项的背景色 */
+    color: #ffa769;
+    font-size: 14px;
+    font-family: "Microsoft YaHei UI";
+}
+
+
+QComboBox::drop-down {
+    background-color: #f3f3f3;
+    border: 1px solid #69d3d1;
+    border-radius: 6px;
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+}
+
+QComboBox::down-arrow {
+    width: 12px;
+    height: 12px;
+    image: url(./UI_source/arrow.png)
+}
+
+
+QLineEdit {
+    background-color: #fefefe;
+    color: #000;
+    border: 1px solid #88e7ff;
+    border-radius: 7px;
+    font-family: "Microsoft YaHei UI";
+    font-size: 14px;
+}
+
+QCheckBox::indicator {
+    font-size: 14px;
+    font-family: "Microsoft YaHei UI";
+    width: 16px;
+    height: 16px;
+    background-color: #ffffff;
+    border: 2px solid #f55353;
+    border-radius: 3px;
+}
+
+QCheckBox::indicator::checked {
+    /*background-color: qradialgradient(cx:0.5, cy:0.5, fx:0.25, fy:0.15, radius:0.3, stop:0 #f1a0a0, stop:1 #d74c4c);*/
+    image: url('./UI_source/yes.png');
+}
