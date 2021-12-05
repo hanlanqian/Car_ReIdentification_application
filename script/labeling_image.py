@@ -6,7 +6,8 @@ import random
 dataset_path = r"C:\Users\hanlanqian\Desktop\car_reid\test\TEST"
 output = r"C:\Users\hanlanqian\Desktop\car_reid\test_processed"
 current_dirs = True
-query_num = 20
+query_num = 50
+random_list = []
 
 os.makedirs(output, exist_ok=True)
 
@@ -23,7 +24,11 @@ for root, dirs, imgs in os.walk(dataset_path, topdown=True):
 img_num = len(os.listdir(output))
 mask = np.full(img_num, fill_value=True)
 for i in range(query_num):
-    mask[random.choice(range(img_num))] = False
+    num = random.choice(range(img_num))
+    while (num in random_list):
+        num = random.choice(range(img_num))
+    random_list.append(num)
+    mask[num] = False        
 
 img_list = os.listdir(output)
 os.makedirs(os.path.join(output, 'image_test'), exist_ok=True)

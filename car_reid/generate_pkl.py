@@ -7,10 +7,6 @@ import re
 
 def veri776(input_path, output_path, train):
     input_path = os.path.abspath(input_path)
-    output_dir, output_filename = os.path.split(output_path)
-    if output_dir != '' and not os.path.exists(output_dir):
-        os.makedirs(output_dir, exist_ok=True)
-
     input_path = Path(input_path).absolute()
     output_dict = {}
 
@@ -37,9 +33,6 @@ def veri776(input_path, output_path, train):
             sample["object_id"] = obj_id
             sample["cam"] = camera
             output_dict[phase].append(sample)
-    print(output_path)
-    with open(output_path, "wb") as f:
-        pkl.dump(output_dict, f)
     return output_dict
 
 

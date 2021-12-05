@@ -13,6 +13,7 @@ test:
   remove_junk: True
   lambda_: 0.0
   infer_flag: False
+#  vehicle_clf_model_path: './car_reid/checkpoints/resNet34.pth'
 
 device: 'cuda'
 

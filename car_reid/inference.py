@@ -1,20 +1,16 @@
+import time
+
 from datasets.datasets import VehicleReIDParsingDataset, get_preprocessing, get_validation_augmentation
 from pathlib import Path
 from reid_utils import mkdir_p
-from yacs.config import CfgNode
-from logzero import logger
 from reid_models import ParsingReidModel, resnet34, resnet50
 from reid_utils.math_tools import Clck_R1_mAP
 from reid_utils.iotools import merge_configs
 from generate_pkl import veri776
-from configs.default_config import cfg
 from datasets import make_basic_dataset
 from torch.utils.data import DataLoader
 
 import torch
-import logging
-import argparse
-import pickle
 import cv2
 import os
 import numpy as np
@@ -112,8 +108,8 @@ def eval_(models,
           rerank=False,
           conf=None,
           split=0,
-          output_html_path='',
           **kwargs):
+    t1 = time.time()
     metric = Clck_R1_mAP(query_length, max_rank=max_rank, rerank=rerank, remove_junk=remove_junk, feat_norm=feat_norm,
                          output_path=output_dir, alpha=conf.getfloat('reid', 'ALPHA'),
                          beta=conf.getfloat('reid', 'BETA'),
@@ -122,6 +118,7 @@ def eval_(models,
     processbar_singal = kwargs.get('signals', None)[0]
     with torch.no_grad():
         for i, batch in enumerate(valid_loader):
+            print(time.time() - t1)
             processbar_singal.emit(int(40 + (i / len(valid_loader)) * 60))
             for name, item in batch.items():
                 if isinstance(item, torch.Tensor):
@@ -135,6 +132,7 @@ def eval_(models,
             metric.update((global_feat.detach().cpu(), local_feat.detach().cpu(), vis_score.cpu(), batch["id"].cpu(),
                            batch["cam"].cpu(), batch["image_path"], color_output, vehicle_type_output))
 
+    print(time.time() - t1)
     info_signal = kwargs.get('signals', None)[1]
     metric_output = metric.compute(split=split, infer_flag=conf.getboolean('default', 'infer_flag'),
                                    pid2rawid=meta_dataset.eval_label2rawid)
@@ -213,5 +211,4 @@ def inference(conf: configparser.ConfigParser, cfg, signals=None):
                     conf=conf,
                     rerank=cfg.test.rerank,
                     split=cfg.test.split,
-                    output_html_path=cfg.test.output_html_path,
                     signals=signals)

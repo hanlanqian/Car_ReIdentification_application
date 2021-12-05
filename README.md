@@ -9,9 +9,9 @@
 
 - 界面概览
   1. 软件主窗口
-    ![image](GUI.jpg)
+      ![image](GUI.jpg)
   2. 设置界面
-    ![image](config_widget.jpg)
+       ![image](config_widget.jpg)
 
 - 功能介绍
     - 已完成
@@ -60,4 +60,4 @@
 
 ## Evaluation
 
-1. 在设置界面打开评估模式
+1. 在设置界面打开评估模式，依赖于正确的车辆id

@@ -103,7 +103,7 @@ def eval_func_mp(distmat, q_pids, g_pids, q_camids, g_camids, max_rank=50, remov
     ], chunksize=32)
     print(time.time() - t1)
 
-    for r in tqdm(res, total=num_q):
+    for r in res:
         all_AP.append(r[0])
         all_cmc.append(r[1])
 
