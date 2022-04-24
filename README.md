@@ -58,7 +58,7 @@
     - 车型分类模型权重vehicle_type.pth
     - 车辆解析模型权重parsing_model.pth
     - veri776重识别模型权重veri776_reid.pth
-    - [权重文件下载链接](https://pan.baidu.com/s/1ZL0MFH7lnFTTrGKCV45l9A)， 提取码：v0m8
+    - [权重文件下载链接](https://pan.baidu.com/s/1vavqI-Qh7hpggmEdHv6CzQ?pwd=n1dh)， 提取码：n1dh
 2. 下载视频处理过程中目标检测所用到的模型权重
     - YOLO4目标检测模型权重yolo4_weights.pth
 3. 设定好相应的PYTHON_PATH，将car_reid和video_process目录加入到PYTHON_PATH中
